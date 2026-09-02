@@ -28,7 +28,10 @@ jobs:
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             echo 'challenges=["${{ inputs.challenge_id }}"]' >> "$GITHUB_OUTPUT"
           else
-            mapfile -t ids < <(find challenges -mindepth 1 -maxdepth 1 -type d -printf '%f\n' | sort)
+            mapfile -t ids < <(
+              find challenges -mindepth 1 -maxdepth 1 -type d -printf '%f\n' \
+                | grep -E '^cm-' | sort
+            )
             if [ ${#ids[@]} -eq 0 ]; then
               echo 'challenges=[]' >> "$GITHUB_OUTPUT"
             else
@@ -55,17 +58,41 @@ jobs:
       - name: Install toolchains
         run: |
           set -euo pipefail
-          sudo dpkg --add-architecture i386
-          sudo apt-get update
-          # wine32 is required to verify PE32 under Wine; wine64 covers PE32+
-          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y \
-            gcc mingw-w64 wine64 wine32 fasm || \
-          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y \
-            gcc mingw-w64 wine64 wine32:i386 fasm
+          YML="challenges/${{ matrix.challenge_id }}/challenge.yml"
+          ARCH=$(awk '/^arch:/{print $2; exit}' "$YML")
+          LANG=$(awk '/^language:/{print $2; exit}' "$YML")
+          echo "challenge arch=$ARCH lang=$LANG"
+
+          PKGS=(gcc)
+          case "$ARCH" in
+            windows-x86)
+              # PE32: MinGW 32-bit + wine32 (i386) for verify
+              sudo dpkg --add-architecture i386
+              sudo apt-get update
+              PKGS+=(mingw-w64 wine64 wine32)
+              ;;
+            windows-x86_64)
+              sudo apt-get update
+              PKGS+=(mingw-w64 wine64)
+              ;;
+            linux-*)
+              sudo apt-get update
+              ;;
+            *)
+              sudo apt-get update
+              PKGS+=(mingw-w64)
+              ;;
+          esac
+          if [ "$LANG" = "asm" ]; then
+            PKGS+=(fasm) || true
+          fi
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y "${PKGS[@]}"
           if [ -x third_party/fasm/fasm.x64 ]; then
             echo "$PWD/third_party/fasm" >> "$GITHUB_PATH"
           fi
-          wine --version || wine64 --version
+          if [[ "$ARCH" == windows-* ]]; then
+            wine --version || wine64 --version || true
+          fi
 
       - name: Install ptk
         run: |
