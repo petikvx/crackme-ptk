@@ -1,0 +1,4 @@
+type: crackme
+language: c
+difficulty: 1
+description: Password check with XOR-encoded secret string

@@ -1,0 +1,52 @@
+{
+  "challenges": [
+    {
+      "id": "cm-2026-001",
+      "name": "xor-gate-easy",
+      "type": "crackme",
+      "language": "c",
+      "arch": "linux-x86_64",
+      "difficulty": 1,
+      "summary": "crackme (c), difficulty 1",
+      "tags": [
+        "crackme",
+        "c",
+        "diff-1"
+      ],
+      "created": "2026-09-01",
+      "download": "xor-gate-easy-linux-x86_64.zip"
+    },
+    {
+      "id": "cm-2026-002",
+      "name": "serial-mix-easy",
+      "type": "keygenme",
+      "language": "c",
+      "arch": "linux-x86_64",
+      "difficulty": 1,
+      "summary": "keygenme (c), difficulty 1",
+      "tags": [
+        "keygenme",
+        "c",
+        "diff-1"
+      ],
+      "created": "2026-09-01",
+      "download": "serial-mix-easy-linux-x86_64.zip"
+    },
+    {
+      "id": "cm-2026-003",
+      "name": "mon-crackme",
+      "type": "crackme",
+      "language": "c",
+      "arch": "linux-x86_64",
+      "difficulty": 1,
+      "summary": "crackme (c), difficulty 1",
+      "tags": [
+        "crackme",
+        "c",
+        "diff-1"
+      ],
+      "created": "2026-09-02",
+      "download": "mon-crackme-linux-x86_64.zip"
+    }
+  ]
+}

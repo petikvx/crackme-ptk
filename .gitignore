@@ -1,0 +1,25 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+dist/
+*.egg
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Challenge local build outputs
+challenges/*/build/
+challenges/*/dist/
+*.o
+*.out
+
+# Packaged public zips (prefer CI Releases)
+*.zip
+
+# Editor / OS
+.DS_Store
+.idea/
+.vscode/
+*.swp

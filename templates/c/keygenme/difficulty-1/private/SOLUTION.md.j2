@@ -1,0 +1,28 @@
+# Solution — {{ name }}
+
+## Algorithm
+
+Seed constant in binary: `0x{{ '%08x'|format(seed) }}`
+
+1. `state = seed ^ 0x9E3779B9`
+2. For each username byte `c`:
+   - `state = state * 1664525 + c + 1013904223` (mod 2³²)
+   - `state ^= state << 13`
+   - `state ^= state >> 17`
+   - `state ^= state << 5`
+3. Four times: `state = state * 1664525 + 1013904223`, append `state & 0xFFFF` as 4 hex digits, joined by `-`.
+
+## Example
+
+- User: `{{ example_user }}`
+- Serial: `{{ example_serial }}`
+
+```bash
+./{{ name }} {{ example_user }} {{ example_serial }}
+```
+
+## Sample table
+
+{% for u, s in sample_serials.items() -%}
+- `{{ u }}` → `{{ s }}`
+{% endfor %}

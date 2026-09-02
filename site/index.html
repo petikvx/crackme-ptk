@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>crackme-ptk</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <h1>crackme-ptk</h1>
+    <p class="tagline">Linux crackmes &amp; keygenmes — generate, build, publish via GitHub.</p>
+  </header>
+
+  <section class="filters">
+    <label>
+      Type
+      <select id="filter-type">
+        <option value="">all</option>
+        <option>crackme</option>
+        <option>keygenme</option>
+        <option>patchme</option>
+        <option>unpackme</option>
+      </select>
+    </label>
+    <label>
+      Language
+      <select id="filter-lang">
+        <option value="">all</option>
+        <option>c</option>
+        <option>cpp</option>
+        <option>asm</option>
+        <option>rust</option>
+        <option>go</option>
+        <option>python</option>
+      </select>
+    </label>
+    <label>
+      Difficulty
+      <select id="filter-diff">
+        <option value="">all</option>
+        <option>1</option>
+        <option>2</option>
+        <option>3</option>
+        <option>4</option>
+        <option>5</option>
+      </select>
+    </label>
+    <input id="filter-q" type="search" placeholder="Search name / tags…" />
+  </section>
+
+  <main>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Lang</th>
+          <th>Diff</th>
+          <th>Created</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="rows">
+        <tr><td colspan="6">Loading catalog…</td></tr>
+      </tbody>
+    </table>
+  </main>
+
+  <footer>
+    <p>Public packs contain the ELF + README only. Author sources and solutions stay private.</p>
+    <p><a href="https://github.com/petikvx/crackme-ptk">Repository</a> · Built with <code>ptk</code></p>
+  </footer>
+
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,109 @@
+name: Build challenge
+
+on:
+  workflow_dispatch:
+    inputs:
+      challenge_id:
+        description: "Challenge id (e.g. cm-2026-001)"
+        required: true
+        type: string
+  push:
+    paths:
+      - "challenges/**"
+      - "generator/**"
+      - "templates/**"
+      - ".github/workflows/build-challenge.yml"
+
+jobs:
+  discover:
+    runs-on: ubuntu-latest
+    outputs:
+      challenges: ${{ steps.set.outputs.challenges }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: set
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo 'challenges=["${{ inputs.challenge_id }}"]' >> "$GITHUB_OUTPUT"
+          else
+            mapfile -t ids < <(find challenges -mindepth 1 -maxdepth 1 -type d -printf '%f\n' | sort)
+            if [ ${#ids[@]} -eq 0 ]; then
+              echo 'challenges=[]' >> "$GITHUB_OUTPUT"
+            else
+              printf -v joined '"%s",' "${ids[@]}"
+              echo "challenges=[${joined%,}]" >> "$GITHUB_OUTPUT"
+            fi
+          fi
+
+  build:
+    needs: discover
+    if: needs.discover.outputs.challenges != '[]'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        challenge_id: ${{ fromJson(needs.discover.outputs.challenges) }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install ptk
+        run: |
+          python -m pip install -e .
+
+      - name: Build, verify, pack
+        run: |
+          ptk all "challenges/${{ matrix.challenge_id }}"
+
+      - name: Upload pack artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: pack-${{ matrix.challenge_id }}
+          path: challenges/${{ matrix.challenge_id }}/dist/*.zip
+
+  catalog:
+    needs: build
+    if: always() && needs.discover.outputs.challenges != '[]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install -e .
+      - run: ptk catalog
+      - uses: actions/upload-artifact@v4
+        with:
+          name: catalog
+          path: |
+            catalog/index.json
+            site/catalog.json
+
+  release:
+    needs: [build, discover]
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: pack-${{ inputs.challenge_id }}
+          path: dist
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          ID="${{ inputs.challenge_id }}"
+          ZIP=$(ls dist/*.zip | head -n1)
+          gh release create "$ID" "$ZIP" \
+            --title "$ID" \
+            --notes "Public pack for $ID (ELF + README). No private sources/solutions included." \
+            --latest=false

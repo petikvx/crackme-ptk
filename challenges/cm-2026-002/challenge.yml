@@ -1,0 +1,24 @@
+id: cm-2026-002
+name: serial-mix-easy
+type: keygenme
+language: c
+arch: linux-x86_64
+difficulty: 1
+summary: keygenme (c), difficulty 1
+tags:
+- keygenme
+- c
+- diff-1
+created: '2026-09-01'
+public:
+  readme: public/README.md
+  binary_name: serial-mix-easy
+private:
+  source_dir: private/src
+  solution: private/SOLUTION.md
+  flag_or_key: serial(user)=seeded-mix(seed=305419896)
+  example_user: alice
+  example_serial: FB94-B1E3-6DE6-2C0D
+params:
+  seed: 305419896
+  algo: seeded_mix_serial

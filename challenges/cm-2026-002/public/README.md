@@ -1,0 +1,27 @@
+# serial-mix-easy
+
+**Type:** keygenme  
+**Language:** c  
+**Difficulty:** 1  
+**Arch:** linux-x86_64
+
+The program validates a serial number for a given username.
+
+## Goal
+
+Recover the serial algorithm and write a keygen that, for any username, produces a valid serial.
+
+## Run
+
+```bash
+chmod +x serial-mix-easy
+./serial-mix-easy <username> <serial>
+```
+
+Example shape: `XXXX-XXXX-XXXX-XXXX` (hex groups).
+
+## Rules
+
+- Target: Linux x86_64 ELF
+- Reverse the binary; do not brute-force blindly
+- Author sources and solutions are **not** included in this pack

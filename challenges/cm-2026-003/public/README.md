@@ -1,0 +1,25 @@
+# mon-crackme
+
+**Type:** crackme  
+**Language:** c  
+**Difficulty:** 1  
+**Arch:** linux-x86_64
+
+Password-protected binary. The secret is not stored in plaintext.
+
+## Goal
+
+Find the correct password so the program prints `Access granted!`.
+
+## Run
+
+```bash
+chmod +x mon-crackme
+./mon-crackme <password>
+```
+
+## Rules
+
+- Target: Linux x86_64 ELF
+- Reverse the binary (static or dynamic analysis)
+- Author sources and solutions are **not** included in this pack
