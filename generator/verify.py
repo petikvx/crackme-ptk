@@ -38,12 +38,22 @@ def verify_challenge(path: Path) -> None:
 
 def _runner(ch: Challenge, binary: Path) -> list[str]:
     if ch.os == "windows":
-        wine = shutil.which("wine") or shutil.which("wine64")
-        if not wine:
-            raise VerifyError(
-                "windows verify requires wine "
-                "(install: sudo apt install wine)"
-            )
+        # PE32 needs a 32-bit capable wine (usually `wine` + wine32).
+        # PE32+ can use wine64.
+        if ch.bits == 32:
+            wine = shutil.which("wine")
+            if not wine:
+                raise VerifyError(
+                    "PE32 verify requires 32-bit wine "
+                    "(install: sudo apt install wine32 wine64)"
+                )
+        else:
+            wine = shutil.which("wine64") or shutil.which("wine")
+            if not wine:
+                raise VerifyError(
+                    "PE32+ verify requires wine "
+                    "(install: sudo apt install wine64)"
+                )
         return [wine, str(binary)]
     return [str(binary)]
 

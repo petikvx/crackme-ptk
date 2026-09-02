@@ -54,12 +54,18 @@ jobs:
 
       - name: Install toolchains
         run: |
+          set -euo pipefail
+          sudo dpkg --add-architecture i386
           sudo apt-get update
-          sudo apt-get install -y gcc mingw-w64 wine64 fasm || true
-          # Prefer vendored fasm.x64 if apt package missing / old
+          # wine32 is required to verify PE32 under Wine; wine64 covers PE32+
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y \
+            gcc mingw-w64 wine64 wine32 fasm || \
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y \
+            gcc mingw-w64 wine64 wine32:i386 fasm
           if [ -x third_party/fasm/fasm.x64 ]; then
             echo "$PWD/third_party/fasm" >> "$GITHUB_PATH"
           fi
+          wine --version || wine64 --version
 
       - name: Install ptk
         run: |
