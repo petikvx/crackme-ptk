@@ -17,6 +17,9 @@ challenges/*/dist/.wineprefix/
 *.o
 *.out
 *.exe
+third_party/*.tgz
+third_party/*.zip
+third_party/fasmw/
 
 # Packaged public zips (prefer CI Releases)
 *.zip

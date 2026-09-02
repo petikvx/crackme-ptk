@@ -1,0 +1,18 @@
+# Solution — {{ name }}
+
+## Password
+
+```
+{{ password }}
+```
+
+## Notes
+
+- Format: **{{ pe_format }}** (`{{ fasm_format }}`)
+- XOR key: `0x{{ '%02x'|format(xor_key) }}`
+- Seed: `{{ seed }}`
+- Toolchain: FASM
+
+```bat
+{{ binary_name }} {{ password }}
+```

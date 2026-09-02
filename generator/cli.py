@@ -71,10 +71,7 @@ def gen_cmd(
             challenge_id=challenge_id,
             arch=arch,
         )
-    except FileNotFoundError as e:
-        click.echo(f"error: {e}", err=True)
-        sys.exit(1)
-    except FileExistsError as e:
+    except (FileNotFoundError, FileExistsError, ValueError) as e:
         click.echo(f"error: {e}", err=True)
         sys.exit(1)
     click.echo(f"generated {out}")

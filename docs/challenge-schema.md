@@ -5,7 +5,8 @@ id: cm-2026-001
 name: xor-gate-easy
 type: crackme          # crackme | keygenme | patchme | unpackme
 language: c            # c | cpp | asm | rust | go | python
-arch: windows-x86_64   # or linux-x86_64 (~88% windows by default at gen time)
+arch: windows-x86_64   # windows-x86 (PE32) | windows-x86_64 (PE32+) | linux-x86_64
+                       # default gen mix: ~88% windows, 50/50 PE32 vs PE32+
 difficulty: 1          # 1..5
 summary: "..."
 tags: [crackme, c, diff-1]

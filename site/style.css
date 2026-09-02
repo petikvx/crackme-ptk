@@ -100,6 +100,9 @@ tr:hover td { background: rgba(61, 222, 156, 0.04); }
 .badge.type-keygenme { color: #fcd34d; border-color: #a16207; }
 .badge.os-linux { color: #86efac; border-color: #15803d; }
 .badge.os-windows { color: #93c5fd; border-color: #1d4ed8; }
+.badge.pe32 { color: #f9a8d4; border-color: #be185d; }
+.badge.pe32plus { color: #c4b5fd; border-color: #6d28d9; }
+.badge.pe-none { color: var(--muted); }
 
 a.btn {
   display: inline-block;

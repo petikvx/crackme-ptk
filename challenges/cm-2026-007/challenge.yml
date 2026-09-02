@@ -1,0 +1,27 @@
+id: cm-2026-007
+name: xor-bytes-easy-3
+type: crackme
+language: c
+arch: windows-x86
+difficulty: 1
+summary: crackme, c, diff 1, windows, PE32, xor_bytes
+tags:
+- crackme
+- c
+- diff-1
+- windows
+- xor_bytes
+- pe32
+created: '2026-09-02'
+public:
+  readme: public/README.md
+  binary_name: xor-bytes-easy-3
+private:
+  source_dir: private/src
+  solution: private/SOLUTION.md
+  flag_or_key: FecqT2A5LKYM
+  password: FecqT2A5LKYM
+params:
+  seed: 153
+  algo: xor_bytes
+  xor_key: 60

@@ -32,6 +32,14 @@
       </select>
     </label>
     <label>
+      PE
+      <select id="filter-pe">
+        <option value="">all</option>
+        <option value="PE32">PE32</option>
+        <option value="PE32+">PE32+</option>
+      </select>
+    </label>
+    <label>
       Language
       <select id="filter-lang">
         <option value="">all</option>
@@ -64,6 +72,7 @@
           <th>Name</th>
           <th>Type</th>
           <th>OS</th>
+          <th>PE</th>
           <th>Lang</th>
           <th>Diff</th>
           <th>Created</th>
@@ -71,7 +80,7 @@
         </tr>
       </thead>
       <tbody id="rows">
-        <tr><td colspan="7">Loading catalog…</td></tr>
+        <tr><td colspan="8">Loading catalog…</td></tr>
       </tbody>
     </table>
   </main>

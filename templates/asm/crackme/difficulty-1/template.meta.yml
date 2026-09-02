@@ -1,0 +1,5 @@
+type: crackme
+language: asm
+difficulty: 1
+assembler: fasm
+description: XOR password crackme (FASM) — PE32 or PE32+

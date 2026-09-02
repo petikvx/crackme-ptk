@@ -53,7 +53,7 @@ def _expect(ch: Challenge, binary: Path, args: list[str], *, expect_success: boo
     env = os.environ.copy()
     if ch.os == "windows":
         env["WINEDEBUG"] = "-all"
-        env["WINEPREFIX"] = str(binary.parent / ".wineprefix")
+        env["WINEPREFIX"] = str((binary.parent / ".wineprefix").resolve())
     proc = subprocess.run(
         cmd,
         capture_output=True,

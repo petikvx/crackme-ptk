@@ -1,0 +1,26 @@
+# {{ name }}
+
+**Type:** crackme  
+**Language:** asm (FASM)  
+**Difficulty:** {{ difficulty }}  
+**OS:** {{ os }}  
+**PE format:** {{ pe_format }}  
+**Arch:** {{ arch }}
+
+Password-protected {{ pe_format }} binary. The secret is XOR-encoded.
+
+## Goal
+
+Find the correct password so the program prints `Access granted!`.
+
+## Run
+
+```bat
+{{ binary_name }} <password>
+```
+
+## Rules
+
+- Target: Windows {{ pe_format }} ({{ bits }}-bit)
+- Assembled with **FASM**
+- Author sources and solutions are **not** included in this pack

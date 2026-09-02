@@ -8,8 +8,14 @@ import yaml
 
 VALID_TYPES = frozenset({"crackme", "keygenme", "patchme", "unpackme"})
 VALID_LANGS = frozenset({"c", "cpp", "asm", "rust", "go", "python"})
-# linux-* and windows-* arches; more can be added later
-VALID_ARCH = frozenset({"linux-x86_64", "windows-x86_64"})
+VALID_ARCH = frozenset(
+    {
+        "linux-x86_64",
+        "linux-x86",
+        "windows-x86_64",  # PE32+
+        "windows-x86",  # PE32
+    }
+)
 
 
 def os_from_arch(arch: str) -> str:
@@ -18,6 +24,21 @@ def os_from_arch(arch: str) -> str:
     if arch.startswith("linux"):
         return "linux"
     return "unknown"
+
+
+def bits_from_arch(arch: str) -> int:
+    if arch.endswith("x86_64") or arch.endswith("amd64"):
+        return 64
+    if arch.endswith("x86"):
+        return 32
+    return 0
+
+
+def pe_format_from_arch(arch: str) -> str | None:
+    """Return PE32 / PE32+ for Windows targets, else None."""
+    if not arch.startswith("windows"):
+        return None
+    return "PE32+" if bits_from_arch(arch) == 64 else "PE32"
 
 
 @dataclass
@@ -46,6 +67,14 @@ class Challenge:
     @property
     def os(self) -> str:
         return os_from_arch(self.arch)
+
+    @property
+    def bits(self) -> int:
+        return bits_from_arch(self.arch)
+
+    @property
+    def pe_format(self) -> str | None:
+        return pe_format_from_arch(self.arch)
 
     @property
     def pack_name(self) -> str:

@@ -4,6 +4,9 @@
 **Language:** c  
 **Difficulty:** {{ difficulty }}  
 **OS:** {{ os | default('linux') }}  
+{% if pe_format -%}
+**PE format:** {{ pe_format }}  
+{% endif -%}
 **Arch:** {{ arch | default('linux-x86_64') }}
 
 Password-protected binary. The secret is not stored in plaintext.

@@ -9,7 +9,7 @@ from pathlib import Path
 from jinja2 import Environment, FileSystemLoader, StrictUndefined
 
 from generator.paths import challenges_dir, templates_dir
-from generator.schema import Challenge, dump_challenge, os_from_arch
+from generator.schema import Challenge, dump_challenge, os_from_arch, pe_format_from_arch
 from generator.secrets import (
     encode_xor_bytes,
     gen_password,
@@ -21,6 +21,8 @@ from generator.secrets import (
 
 # Default mix for generated challenges when --arch is omitted
 WINDOWS_ARCH_RATIO = 0.88
+# Among Windows targets: ~50% PE32 / ~50% PE32+
+WINDOWS_PE32_RATIO = 0.50
 DEFAULT_WINDOWS_ARCH = "windows-x86_64"
 DEFAULT_LINUX_ARCH = "linux-x86_64"
 
@@ -42,11 +44,13 @@ _ALGO_NAME = {
 
 
 def pick_arch(explicit: str | None = None) -> str:
-    """Choose target arch; ~88% Windows when not specified."""
+    """Choose target arch; ~88% Windows (50/50 PE32 vs PE32+), else Linux x86_64."""
     if explicit:
         return explicit
     if random.random() < WINDOWS_ARCH_RATIO:
-        return DEFAULT_WINDOWS_ARCH
+        if random.random() < WINDOWS_PE32_RATIO:
+            return "windows-x86"  # PE32
+        return "windows-x86_64"  # PE32+
     return DEFAULT_LINUX_ARCH
 
 
@@ -209,8 +213,14 @@ def generate(
 ) -> Path:
     root = challenges_dir()
     root.mkdir(parents=True, exist_ok=True)
+    if language == "asm" and arch and arch.startswith("linux"):
+        raise ValueError("asm/FASM challenges currently target Windows PE only")
     arch = pick_arch(arch)
+    # ASM templates are FASM → Windows PE32 / PE32+
+    if language == "asm" and arch.startswith("linux"):
+        arch = "windows-x86" if random.random() < WINDOWS_PE32_RATIO else "windows-x86_64"
     os_name = os_from_arch(arch)
+    pe_fmt = pe_format_from_arch(arch)
     algo = "xor_bytes" if type_ == "crackme" else "seeded_mix_serial"
     if name:
         name_slug = slugify(name)
@@ -240,11 +250,25 @@ def generate(
     )
     ctx["arch"] = arch
     ctx["os"] = os_name
+    ctx["pe_format"] = pe_fmt
+    ctx["bits"] = 64 if arch.endswith("x86_64") else 32
     ctx["binary_name"] = f"{name_slug}.exe" if os_name == "windows" else name_slug
+    # FASM format directive
+    if pe_fmt == "PE32+":
+        ctx["fasm_format"] = "PE64 console"
+    elif pe_fmt == "PE32":
+        ctx["fasm_format"] = "PE console"
+    else:
+        ctx["fasm_format"] = "ELF executable"
+    ctx["encoded_password_fasm"] = ",".join(f"0x{b:02x}" for b in ctx["encoded_password"])
 
     out.mkdir(parents=True)
     render_dir(tpl, "public", out / "public", ctx)
     render_dir(tpl, "private", out / "private", ctx)
+
+    tags = [type_, language, f"diff-{difficulty}", os_name, algo]
+    if pe_fmt:
+        tags.append(pe_fmt.lower().replace("+", "plus"))
 
     ch = Challenge(
         id=cid,
@@ -253,8 +277,10 @@ def generate(
         language=language,
         arch=arch,
         difficulty=difficulty,
-        summary=_summary_for(type_, language, difficulty, algo=algo, os_name=os_name),
-        tags=[type_, language, f"diff-{difficulty}", os_name, algo],
+        summary=_summary_for(
+            type_, language, difficulty, algo=algo, os_name=os_name, pe_format=pe_fmt
+        ),
+        tags=tags,
         created=date.today().isoformat(),
         public={
             "readme": "public/README.md",
@@ -301,8 +327,11 @@ def _summary_for(
     *,
     algo: str | None = None,
     os_name: str = "linux",
+    pe_format: str | None = None,
 ) -> str:
     bits = [type_, language, f"diff {difficulty}", os_name]
+    if pe_format:
+        bits.append(pe_format)
     if algo:
         bits.append(algo)
     return ", ".join(bits)

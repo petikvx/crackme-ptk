@@ -2,7 +2,10 @@
 
 Generate **crackmes** / **keygenmes** (mostly **Windows** PE, some Linux ELF), keep **sources + solutions private**, and publish **player packs** (binary + README) via **GitHub Actions / Releases / Pages**.
 
-By default, about **88%** of generated challenges target `windows-x86_64` (MinGW cross-build); the rest are `linux-x86_64`. Override with `--arch`.
+By default, about **88%** of generated challenges target Windows (**50/50 PE32 / PE32+**); the rest are Linux ELF. Override with `--arch`.
+
+- C: MinGW (`windows-x86` → PE32, `windows-x86_64` → PE32+)
+- ASM: **FASM** (`format PE console` / `format PE64 console`) — see [docs/fasm.md](docs/fasm.md)
 
 Inspired by [crackmes.one](https://crackmes.one/), but focused on a generator + GitHub-native workflow.
 

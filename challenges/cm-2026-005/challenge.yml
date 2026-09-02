@@ -1,0 +1,27 @@
+id: cm-2026-005
+name: xor-bytes-easy-asm
+type: crackme
+language: asm
+arch: windows-x86
+difficulty: 1
+summary: crackme, asm, diff 1, windows, PE32, xor_bytes
+tags:
+- crackme
+- asm
+- diff-1
+- windows
+- xor_bytes
+- pe32
+created: '2026-09-02'
+public:
+  readme: public/README.md
+  binary_name: xor-bytes-easy-asm
+private:
+  source_dir: private/src
+  solution: private/SOLUTION.md
+  flag_or_key: AssG2oCDHCJ7
+  password: AssG2oCDHCJ7
+params:
+  seed: 65
+  algo: xor_bytes
+  xor_key: 228

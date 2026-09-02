@@ -21,6 +21,8 @@ def build_catalog() -> Path:
                     "type": ch.type,
                     "language": ch.language,
                     "os": ch.os,
+                    "pe_format": ch.pe_format,
+                    "bits": ch.bits,
                     "arch": ch.arch,
                     "difficulty": ch.difficulty,
                     "summary": ch.summary,
