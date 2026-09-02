@@ -12,8 +12,11 @@ dist/
 # Challenge local build outputs
 challenges/*/build/
 challenges/*/dist/
+challenges/*/.wineprefix/
+challenges/*/dist/.wineprefix/
 *.o
 *.out
+*.exe
 
 # Packaged public zips (prefer CI Releases)
 *.zip

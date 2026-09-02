@@ -3,7 +3,7 @@
 **Type:** crackme  
 **Language:** c  
 **Difficulty:** {{ difficulty }}  
-**OS:** linux  
+**OS:** {{ os | default('linux') }}  
 **Arch:** {{ arch | default('linux-x86_64') }}
 
 Password-protected binary. The secret is not stored in plaintext.
@@ -14,13 +14,23 @@ Find the correct password so the program prints `Access granted!`.
 
 ## Run
 
-```bash
-chmod +x {{ name }}
-./{{ name }} <password>
+{% if os == 'windows' -%}
+```bat
+{{ binary_name | default(name ~ '.exe') }} <password>
 ```
+{% else -%}
+```bash
+chmod +x {{ binary_name | default(name) }}
+./{{ binary_name | default(name) }} <password>
+```
+{% endif %}
 
 ## Rules
 
+{% if os == 'windows' -%}
+- Target: Windows x86_64 PE (`.exe`)
+{% else -%}
 - Target: Linux x86_64 ELF
+{% endif -%}
 - Reverse the binary (static or dynamic analysis)
 - Author sources and solutions are **not** included in this pack

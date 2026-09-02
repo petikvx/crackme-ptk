@@ -26,7 +26,7 @@ def _parse_seed(_ctx: click.Context, _param: click.Parameter, value: str | None)
 @click.group()
 @click.version_option(__version__, prog_name="ptk")
 def main() -> None:
-    """crackme-ptk — generate, build, verify and pack Linux crackmes."""
+    """crackme-ptk — generate, build, verify and pack crackmes (Windows/Linux)."""
 
 
 @main.command("gen")
@@ -41,8 +41,8 @@ def main() -> None:
 @click.option(
     "--arch",
     type=click.Choice(sorted(VALID_ARCH)),
-    default="linux-x86_64",
-    show_default=True,
+    default=None,
+    help="Target arch (default: ~88% windows-x86_64, ~12% linux-x86_64)",
 )
 @click.option(
     "--seed",

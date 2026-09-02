@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import random
 import re
 import secrets
 from datetime import date
@@ -8,7 +9,7 @@ from pathlib import Path
 from jinja2 import Environment, FileSystemLoader, StrictUndefined
 
 from generator.paths import challenges_dir, templates_dir
-from generator.schema import Challenge, dump_challenge
+from generator.schema import Challenge, dump_challenge, os_from_arch
 from generator.secrets import (
     encode_xor_bytes,
     gen_password,
@@ -17,6 +18,11 @@ from generator.secrets import (
     sample_usernames,
     xor_key_from_seed,
 )
+
+# Default mix for generated challenges when --arch is omitted
+WINDOWS_ARCH_RATIO = 0.88
+DEFAULT_WINDOWS_ARCH = "windows-x86_64"
+DEFAULT_LINUX_ARCH = "linux-x86_64"
 
 _SLUG_RE = re.compile(r"[^a-z0-9]+")
 
@@ -35,17 +41,24 @@ _ALGO_NAME = {
 }
 
 
+def pick_arch(explicit: str | None = None) -> str:
+    """Choose target arch; ~88% Windows when not specified."""
+    if explicit:
+        return explicit
+    if random.random() < WINDOWS_ARCH_RATIO:
+        return DEFAULT_WINDOWS_ARCH
+    return DEFAULT_LINUX_ARCH
+
+
 def suggest_name(
     *,
     type_: str,
     language: str,
     difficulty: int,
     algo: str | None = None,
-    arch: str = "linux-x86_64",
+    arch: str = DEFAULT_LINUX_ARCH,
 ) -> str:
     """Pick a descriptive slug from type / algo / difficulty / OS."""
-    from generator.schema import os_from_arch
-
     diff = _DIFF_LABEL.get(difficulty, f"d{difficulty}")
     if algo and algo in _ALGO_NAME:
         base = _ALGO_NAME[algo]
@@ -55,13 +68,10 @@ def suggest_name(
         base = "serial-mix"
     else:
         base = type_
-    os_name = os_from_arch(arch)
-    # Keep names short: algo-diff, disambiguate with lang if not c
+    # OS is tracked in challenge.yml / catalog — keep the slug focused on mechanic.
     parts = [base, diff]
     if language != "c":
         parts.append(language)
-    if os_name != "linux":
-        parts.append(os_name)
     return slugify("-".join(parts))
 
 
@@ -195,10 +205,12 @@ def generate(
     name: str | None = None,
     seed: int | None = None,
     challenge_id: str | None = None,
-    arch: str = "linux-x86_64",
+    arch: str | None = None,
 ) -> Path:
     root = challenges_dir()
     root.mkdir(parents=True, exist_ok=True)
+    arch = pick_arch(arch)
+    os_name = os_from_arch(arch)
     algo = "xor_bytes" if type_ == "crackme" else "seeded_mix_serial"
     if name:
         name_slug = slugify(name)
@@ -227,14 +239,13 @@ def generate(
         seed=seed,
     )
     ctx["arch"] = arch
+    ctx["os"] = os_name
+    ctx["binary_name"] = f"{name_slug}.exe" if os_name == "windows" else name_slug
 
     out.mkdir(parents=True)
     render_dir(tpl, "public", out / "public", ctx)
     render_dir(tpl, "private", out / "private", ctx)
 
-    from generator.schema import os_from_arch
-
-    os_name = os_from_arch(arch)
     ch = Challenge(
         id=cid,
         name=name_slug,
@@ -319,15 +330,21 @@ def _default_readme(ch: Challenge) -> str:
         if ch.type == "crackme"
         else "Write a keygen: given a username, produce a valid serial."
     )
+    target = (
+        "Windows x86_64 PE (.exe)"
+        if ch.os == "windows"
+        else "Linux x86_64 ELF"
+    )
     return (
         f"# {ch.name}\n\n"
         f"**Type:** {ch.type}  \n"
         f"**Language:** {ch.language}  \n"
         f"**Difficulty:** {ch.difficulty}  \n"
+        f"**OS:** {ch.os}  \n"
         f"**Arch:** {ch.arch}\n\n"
         f"{ch.summary}\n\n"
         f"## Goal\n\n{goal}\n\n"
         "## Rules\n\n"
-        "- Linux x86_64 ELF\n"
+        f"- Target: {target}\n"
         "- Author private sources and solutions are not included in this pack\n"
     )

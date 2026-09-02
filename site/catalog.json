@@ -52,6 +52,25 @@
       ],
       "created": "2026-09-02",
       "download": "xor-bytes-easy-linux-x86_64.zip"
+    },
+    {
+      "id": "cm-2026-004",
+      "name": "xor-bytes-easy-2",
+      "type": "crackme",
+      "language": "c",
+      "os": "windows",
+      "arch": "windows-x86_64",
+      "difficulty": 1,
+      "summary": "crackme, c, diff 1, windows, xor_bytes",
+      "tags": [
+        "crackme",
+        "c",
+        "diff-1",
+        "windows",
+        "xor_bytes"
+      ],
+      "created": "2026-09-02",
+      "download": "xor-bytes-easy-2-windows-x86_64.zip"
     }
   ]
 }

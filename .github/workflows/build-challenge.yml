@@ -52,11 +52,18 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: Install toolchains
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc mingw-w64 wine64
+
       - name: Install ptk
         run: |
           python -m pip install -e .
 
       - name: Build, verify, pack
+        env:
+          WINEDEBUG: "-all"
         run: |
           ptk all "challenges/${{ matrix.challenge_id }}"
 
@@ -105,5 +112,5 @@ jobs:
           ZIP=$(ls dist/*.zip | head -n1)
           gh release create "$ID" "$ZIP" \
             --title "$ID" \
-            --notes "Public pack for $ID (ELF + README). No private sources/solutions included." \
+            --notes "Public pack for $ID (binary + README). No private sources/solutions included." \
             --latest=false

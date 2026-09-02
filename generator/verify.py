@@ -1,9 +1,12 @@
 from __future__ import annotations
 
+import os
+import shutil
 import subprocess
 from pathlib import Path
 
 from generator.build import load_from_arg
+from generator.schema import Challenge
 from generator.secrets import keygenme_serial, sample_usernames
 
 
@@ -21,29 +24,48 @@ def verify_challenge(path: Path) -> None:
         password = ch.private.get("password")
         if not password:
             raise VerifyError("crackme missing private.password")
-        _expect(binary, [password], expect_success=True)
-        _expect(binary, ["wrong-password-xxx"], expect_success=False)
+        _expect(ch, binary, [password], expect_success=True)
+        _expect(ch, binary, ["wrong-password-xxx"], expect_success=False)
     elif ch.type == "keygenme":
         seed = int(ch.params["seed"])
         for user in sample_usernames()[:3]:
             serial = keygenme_serial(user, seed)
-            _expect(binary, [user, serial], expect_success=True)
-        _expect(binary, ["alice", "AAAA-BBBB-CCCC-DDDD"], expect_success=False)
+            _expect(ch, binary, [user, serial], expect_success=True)
+        _expect(ch, binary, ["alice", "AAAA-BBBB-CCCC-DDDD"], expect_success=False)
     else:
         raise VerifyError(f"verify not implemented for type={ch.type}")
 
 
-def _expect(binary: Path, args: list[str], *, expect_success: bool) -> None:
+def _runner(ch: Challenge, binary: Path) -> list[str]:
+    if ch.os == "windows":
+        wine = shutil.which("wine") or shutil.which("wine64")
+        if not wine:
+            raise VerifyError(
+                "windows verify requires wine "
+                "(install: sudo apt install wine)"
+            )
+        return [wine, str(binary)]
+    return [str(binary)]
+
+
+def _expect(ch: Challenge, binary: Path, args: list[str], *, expect_success: bool) -> None:
+    cmd = [*_runner(ch, binary), *args]
+    env = os.environ.copy()
+    if ch.os == "windows":
+        env["WINEDEBUG"] = "-all"
+        env["WINEPREFIX"] = str(binary.parent / ".wineprefix")
     proc = subprocess.run(
-        [str(binary), *args],
+        cmd,
         capture_output=True,
         text=True,
-        timeout=10,
+        timeout=60,
+        env=env,
     )
     ok = proc.returncode == 0
     if ok != expect_success:
         raise VerifyError(
             f"unexpected result for args={args!r}: "
             f"rc={proc.returncode} success={ok} expected_success={expect_success}\n"
+            f"cmd: {cmd}\n"
             f"stdout:\n{proc.stdout}\nstderr:\n{proc.stderr}"
         )

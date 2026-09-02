@@ -40,16 +40,34 @@ def build_challenge(path: Path) -> Path:
     return binary
 
 
+def _c_compiler(ch: Challenge) -> tuple[str, str | None]:
+    """Return (compiler, strip_tool)."""
+    if ch.os == "windows":
+        cc = shutil.which("x86_64-w64-mingw32-gcc")
+        if not cc:
+            raise BuildError(
+                "windows build requires mingw-w64 "
+                "(install: sudo apt install mingw-w64)"
+            )
+        strip = shutil.which("x86_64-w64-mingw32-strip") or shutil.which("strip")
+        return cc, strip
+    cc = shutil.which("gcc")
+    if not cc:
+        raise BuildError("gcc not found")
+    return cc, shutil.which("strip")
+
+
 def _build_c(cdir: Path, ch: Challenge, build_dir: Path, dist_dir: Path) -> Path:
     src_dir = cdir / ch.private.get("source_dir", "private/src")
     sources = sorted(src_dir.glob("*.c"))
     if not sources:
         raise BuildError(f"no .c sources in {src_dir}")
 
+    cc, strip_tool = _c_compiler(ch)
     binary_name = ch.binary_name
     out = dist_dir / binary_name
     cmd = [
-        "gcc",
+        cc,
         "-O1",
         "-fno-inline",
         "-Wall",
@@ -61,20 +79,15 @@ def _build_c(cdir: Path, ch: Challenge, build_dir: Path, dist_dir: Path) -> Path
     proc = subprocess.run(cmd, capture_output=True, text=True)
     if proc.returncode != 0:
         raise BuildError(
-            f"gcc failed ({proc.returncode}):\n{proc.stdout}\n{proc.stderr}"
+            f"{cc} failed ({proc.returncode}):\n{proc.stdout}\n{proc.stderr}"
         )
 
-    # Strip symbols for the player-facing binary
-    if shutil.which("strip"):
-        subprocess.run(["strip", "-s", str(out)], check=False)
+    if strip_tool:
+        subprocess.run([strip_tool, "-s", str(out)], check=False)
 
-    # Keep unstripped copy for author debugging
-    debug_copy = build_dir / f"{binary_name}.debug"
-    # Rebuild without strip into build/ — simplest: copy before strip already done.
-    # Recompile to build/ without strip.
     debug_out = build_dir / binary_name
     cmd_dbg = [
-        "gcc",
+        cc,
         "-O0",
         "-g",
         "-Wall",
@@ -83,7 +96,5 @@ def _build_c(cdir: Path, ch: Challenge, build_dir: Path, dist_dir: Path) -> Path
         *[str(s) for s in sources],
     ]
     subprocess.run(cmd_dbg, check=False, capture_output=True, text=True)
-    if debug_out.exists() and not debug_copy.exists():
-        shutil.copy2(debug_out, debug_copy)
 
     return out

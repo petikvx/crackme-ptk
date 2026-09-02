@@ -1,0 +1,26 @@
+id: cm-2026-004
+name: xor-bytes-easy-2
+type: crackme
+language: c
+arch: windows-x86_64
+difficulty: 1
+summary: crackme, c, diff 1, windows, xor_bytes
+tags:
+- crackme
+- c
+- diff-1
+- windows
+- xor_bytes
+created: '2026-09-02'
+public:
+  readme: public/README.md
+  binary_name: xor-bytes-easy-2
+private:
+  source_dir: private/src
+  solution: private/SOLUTION.md
+  flag_or_key: A7PLf43J4PND
+  password: A7PLf43J4PND
+params:
+  seed: 57005
+  algo: xor_bytes
+  xor_key: 8

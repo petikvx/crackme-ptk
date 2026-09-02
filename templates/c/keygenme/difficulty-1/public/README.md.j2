@@ -3,7 +3,7 @@
 **Type:** keygenme  
 **Language:** c  
 **Difficulty:** {{ difficulty }}  
-**OS:** linux  
+**OS:** {{ os | default('linux') }}  
 **Arch:** {{ arch | default('linux-x86_64') }}
 
 The program validates a serial number for a given username.
@@ -14,15 +14,25 @@ Recover the serial algorithm and write a keygen that, for any username, produces
 
 ## Run
 
-```bash
-chmod +x {{ name }}
-./{{ name }} <username> <serial>
+{% if os == 'windows' -%}
+```bat
+{{ binary_name | default(name ~ '.exe') }} <username> <serial>
 ```
+{% else -%}
+```bash
+chmod +x {{ binary_name | default(name) }}
+./{{ binary_name | default(name) }} <username> <serial>
+```
+{% endif %}
 
 Example shape: `XXXX-XXXX-XXXX-XXXX` (hex groups).
 
 ## Rules
 
+{% if os == 'windows' -%}
+- Target: Windows x86_64 PE (`.exe`)
+{% else -%}
 - Target: Linux x86_64 ELF
+{% endif -%}
 - Reverse the binary; do not brute-force blindly
 - Author sources and solutions are **not** included in this pack

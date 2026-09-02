@@ -38,7 +38,10 @@ class Challenge:
 
     @property
     def binary_name(self) -> str:
-        return self.public.get("binary_name") or self.name
+        name = str(self.public.get("binary_name") or self.name)
+        if self.os == "windows" and not name.lower().endswith(".exe"):
+            return f"{name}.exe"
+        return name
 
     @property
     def os(self) -> str:

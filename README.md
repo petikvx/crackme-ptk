@@ -1,6 +1,8 @@
 # crackme-ptk
 
-Generate Linux **crackmes** / **keygenmes**, keep **sources + solutions private**, and publish **player packs** (ELF + README) via **GitHub Actions / Releases / Pages**.
+Generate **crackmes** / **keygenmes** (mostly **Windows** PE, some Linux ELF), keep **sources + solutions private**, and publish **player packs** (binary + README) via **GitHub Actions / Releases / Pages**.
+
+By default, about **88%** of generated challenges target `windows-x86_64` (MinGW cross-build); the rest are `linux-x86_64`. Override with `--arch`.
 
 Inspired by [crackmes.one](https://crackmes.one/), but focused on a generator + GitHub-native workflow.
 
@@ -29,11 +31,13 @@ python -m venv .venv
 source .venv/bin/activate
 pip install -e .
 
-# Generate
-ptk gen --type crackme --lang c --difficulty 1 --name xor-gate-easy
-ptk gen --type keygenme --lang c --difficulty 1 --name serial-mix-easy
+# Generate (auto name + ~88% Windows)
+ptk gen --type crackme --lang c --difficulty 1
+ptk gen --type keygenme --lang c --difficulty 1 --arch linux-x86_64
 
 # Build + verify + public zip
+# Windows: needs mingw-w64 (+ wine for verify)
+# Linux: needs gcc
 ptk all challenges/cm-YYYY-001
 
 # Refresh catalogue for the site
