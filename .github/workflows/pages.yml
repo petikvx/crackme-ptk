@@ -35,6 +35,9 @@ jobs:
           ptk catalog
       - name: Setup Pages
         uses: actions/configure-pages@v5
+        with:
+          # Enable Pages + GitHub Actions source if not already configured
+          enablement: true
       - name: Upload site
         uses: actions/upload-pages-artifact@v3
         with:
