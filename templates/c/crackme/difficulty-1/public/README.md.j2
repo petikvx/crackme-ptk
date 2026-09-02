@@ -3,7 +3,8 @@
 **Type:** crackme  
 **Language:** c  
 **Difficulty:** {{ difficulty }}  
-**Arch:** linux-x86_64
+**OS:** linux  
+**Arch:** {{ arch | default('linux-x86_64') }}
 
 Password-protected binary. The secret is not stored in plaintext.
 

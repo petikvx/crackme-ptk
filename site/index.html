@@ -9,7 +9,7 @@
 <body>
   <header>
     <h1>crackme-ptk</h1>
-    <p class="tagline">Linux crackmes &amp; keygenmes — generate, build, publish via GitHub.</p>
+    <p class="tagline">Crackmes &amp; keygenmes — generate, build, publish via GitHub.</p>
   </header>
 
   <section class="filters">
@@ -21,6 +21,14 @@
         <option>keygenme</option>
         <option>patchme</option>
         <option>unpackme</option>
+      </select>
+    </label>
+    <label>
+      OS
+      <select id="filter-os">
+        <option value="">all</option>
+        <option value="linux">linux</option>
+        <option value="windows">windows</option>
       </select>
     </label>
     <label>
@@ -55,6 +63,7 @@
         <tr>
           <th>Name</th>
           <th>Type</th>
+          <th>OS</th>
           <th>Lang</th>
           <th>Diff</th>
           <th>Created</th>
@@ -62,13 +71,13 @@
         </tr>
       </thead>
       <tbody id="rows">
-        <tr><td colspan="6">Loading catalog…</td></tr>
+        <tr><td colspan="7">Loading catalog…</td></tr>
       </tbody>
     </table>
   </main>
 
   <footer>
-    <p>Public packs contain the ELF + README only. Author sources and solutions stay private.</p>
+    <p>Public packs contain the binary + README only. Author sources and solutions stay private.</p>
     <p><a href="https://github.com/petikvx/crackme-ptk">Repository</a> · Built with <code>ptk</code></p>
   </footer>
 

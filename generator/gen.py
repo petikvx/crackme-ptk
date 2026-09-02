@@ -27,6 +27,65 @@ def slugify(name: str) -> str:
     return s or "challenge"
 
 
+_DIFF_LABEL = {1: "easy", 2: "medium", 3: "hard", 4: "expert", 5: "insane"}
+
+_ALGO_NAME = {
+    "xor_bytes": "xor-bytes",
+    "seeded_mix_serial": "serial-mix",
+}
+
+
+def suggest_name(
+    *,
+    type_: str,
+    language: str,
+    difficulty: int,
+    algo: str | None = None,
+    arch: str = "linux-x86_64",
+) -> str:
+    """Pick a descriptive slug from type / algo / difficulty / OS."""
+    from generator.schema import os_from_arch
+
+    diff = _DIFF_LABEL.get(difficulty, f"d{difficulty}")
+    if algo and algo in _ALGO_NAME:
+        base = _ALGO_NAME[algo]
+    elif type_ == "crackme":
+        base = "xor-bytes"
+    elif type_ == "keygenme":
+        base = "serial-mix"
+    else:
+        base = type_
+    os_name = os_from_arch(arch)
+    # Keep names short: algo-diff, disambiguate with lang if not c
+    parts = [base, diff]
+    if language != "c":
+        parts.append(language)
+    if os_name != "linux":
+        parts.append(os_name)
+    return slugify("-".join(parts))
+
+
+def unique_name(base: str, challenges: Path) -> str:
+    """Ensure name is unique among existing challenges."""
+    taken: set[str] = set()
+    if challenges.exists():
+        for yml in challenges.glob("*/challenge.yml"):
+            try:
+                data = yml.read_text(encoding="utf-8")
+            except OSError:
+                continue
+            for line in data.splitlines():
+                if line.startswith("name:"):
+                    taken.add(line.split(":", 1)[1].strip().strip("'\""))
+                    break
+    if base not in taken:
+        return base
+    n = 2
+    while f"{base}-{n}" in taken:
+        n += 1
+    return f"{base}-{n}"
+
+
 def next_id(challenges: Path) -> str:
     existing: set[str] = set()
     if challenges.exists():
@@ -133,13 +192,27 @@ def generate(
     type_: str,
     language: str,
     difficulty: int = 1,
-    name: str,
+    name: str | None = None,
     seed: int | None = None,
     challenge_id: str | None = None,
+    arch: str = "linux-x86_64",
 ) -> Path:
-    name_slug = slugify(name)
     root = challenges_dir()
     root.mkdir(parents=True, exist_ok=True)
+    algo = "xor_bytes" if type_ == "crackme" else "seeded_mix_serial"
+    if name:
+        name_slug = slugify(name)
+    else:
+        name_slug = unique_name(
+            suggest_name(
+                type_=type_,
+                language=language,
+                difficulty=difficulty,
+                algo=algo,
+                arch=arch,
+            ),
+            root,
+        )
     cid = challenge_id or next_id(root)
     out = root / cid
     if out.exists():
@@ -153,20 +226,24 @@ def generate(
         name=name_slug,
         seed=seed,
     )
+    ctx["arch"] = arch
 
     out.mkdir(parents=True)
     render_dir(tpl, "public", out / "public", ctx)
     render_dir(tpl, "private", out / "private", ctx)
 
+    from generator.schema import os_from_arch
+
+    os_name = os_from_arch(arch)
     ch = Challenge(
         id=cid,
         name=name_slug,
         type=type_,
         language=language,
-        arch="linux-x86_64",
+        arch=arch,
         difficulty=difficulty,
-        summary=_summary_for(type_, language, difficulty),
-        tags=[type_, language, f"diff-{difficulty}"],
+        summary=_summary_for(type_, language, difficulty, algo=algo, os_name=os_name),
+        tags=[type_, language, f"diff-{difficulty}", os_name, algo],
         created=date.today().isoformat(),
         public={
             "readme": "public/README.md",
@@ -183,7 +260,7 @@ def generate(
         },
         params={
             "seed": ctx["seed"],
-            "algo": "xor_bytes" if type_ == "crackme" else "seeded_mix_serial",
+            "algo": algo,
         },
     )
     if type_ == "crackme":
@@ -206,8 +283,18 @@ def generate(
     return out
 
 
-def _summary_for(type_: str, language: str, difficulty: int) -> str:
-    return f"{type_} ({language}), difficulty {difficulty}"
+def _summary_for(
+    type_: str,
+    language: str,
+    difficulty: int,
+    *,
+    algo: str | None = None,
+    os_name: str = "linux",
+) -> str:
+    bits = [type_, language, f"diff {difficulty}", os_name]
+    if algo:
+        bits.append(algo)
+    return ", ".join(bits)
 
 
 def _default_solution(type_: str, ctx: dict) -> str:

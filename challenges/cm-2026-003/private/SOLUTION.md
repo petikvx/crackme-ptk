@@ -1,4 +1,4 @@
-# Solution — mon-crackme
+# Solution — xor-bytes-easy
 
 ## Password
 
@@ -15,5 +15,5 @@
 ## Quick check
 
 ```bash
-./mon-crackme '2VMcZyBNjdda'
+./xor-bytes-easy '2VMcZyBNjdda'
 ```

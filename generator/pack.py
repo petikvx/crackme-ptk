@@ -32,7 +32,7 @@ def pack_challenge(path: Path, *, output: Path | None = None) -> Path:
     if not readme.is_file():
         raise PackError(f"missing public readme: {readme}")
 
-    out = output or (cdir / "dist" / f"{ch.name}-linux-x86_64.zip")
+    out = output or (cdir / "dist" / ch.pack_name)
     out.parent.mkdir(parents=True, exist_ok=True)
 
     with zipfile.ZipFile(out, "w", compression=zipfile.ZIP_DEFLATED) as zf:

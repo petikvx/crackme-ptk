@@ -1,8 +1,9 @@
-# mon-crackme
+# xor-bytes-easy
 
 **Type:** crackme  
 **Language:** c  
 **Difficulty:** 1  
+**OS:** linux  
 **Arch:** linux-x86_64
 
 Password-protected binary. The secret is not stored in plaintext.
@@ -14,8 +15,8 @@ Find the correct password so the program prints `Access granted!`.
 ## Run
 
 ```bash
-chmod +x mon-crackme
-./mon-crackme <password>
+chmod +x xor-bytes-easy
+./xor-bytes-easy <password>
 ```
 
 ## Rules

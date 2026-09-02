@@ -20,12 +20,13 @@ def build_catalog() -> Path:
                     "name": ch.name,
                     "type": ch.type,
                     "language": ch.language,
+                    "os": ch.os,
                     "arch": ch.arch,
                     "difficulty": ch.difficulty,
                     "summary": ch.summary,
                     "tags": ch.tags,
                     "created": ch.created,
-                    "download": f"{ch.name}-linux-x86_64.zip",
+                    "download": ch.pack_name,
                 }
             )
 

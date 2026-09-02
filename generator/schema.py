@@ -8,7 +8,16 @@ import yaml
 
 VALID_TYPES = frozenset({"crackme", "keygenme", "patchme", "unpackme"})
 VALID_LANGS = frozenset({"c", "cpp", "asm", "rust", "go", "python"})
-VALID_ARCH = frozenset({"linux-x86_64"})
+# linux-* and windows-* arches; more can be added later
+VALID_ARCH = frozenset({"linux-x86_64", "windows-x86_64"})
+
+
+def os_from_arch(arch: str) -> str:
+    if arch.startswith("windows"):
+        return "windows"
+    if arch.startswith("linux"):
+        return "linux"
+    return "unknown"
 
 
 @dataclass
@@ -30,6 +39,14 @@ class Challenge:
     @property
     def binary_name(self) -> str:
         return self.public.get("binary_name") or self.name
+
+    @property
+    def os(self) -> str:
+        return os_from_arch(self.arch)
+
+    @property
+    def pack_name(self) -> str:
+        return f"{self.name}-{self.arch}.zip"
 
     def validate(self) -> None:
         if self.type not in VALID_TYPES:

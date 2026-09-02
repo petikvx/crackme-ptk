@@ -10,7 +10,7 @@ from generator.build import BuildError, build_challenge
 from generator.catalog import build_catalog
 from generator.gen import generate
 from generator.pack import LeakError, PackError, pack_challenge
-from generator.schema import VALID_LANGS, VALID_TYPES
+from generator.schema import VALID_ARCH, VALID_LANGS, VALID_TYPES
 from generator.verify import VerifyError, verify_challenge
 
 
@@ -33,7 +33,17 @@ def main() -> None:
 @click.option("--type", "type_", type=click.Choice(sorted(VALID_TYPES)), required=True)
 @click.option("--lang", "language", type=click.Choice(sorted(VALID_LANGS)), required=True)
 @click.option("--difficulty", type=click.IntRange(1, 5), default=1, show_default=True)
-@click.option("--name", required=True, help="Challenge display/slug name")
+@click.option(
+    "--name",
+    default=None,
+    help="Optional slug; auto-chosen from type/algo/difficulty if omitted",
+)
+@click.option(
+    "--arch",
+    type=click.Choice(sorted(VALID_ARCH)),
+    default="linux-x86_64",
+    show_default=True,
+)
 @click.option(
     "--seed",
     default=None,
@@ -45,7 +55,8 @@ def gen_cmd(
     type_: str,
     language: str,
     difficulty: int,
-    name: str,
+    name: str | None,
+    arch: str,
     seed: int | None,
     challenge_id: str | None,
 ) -> None:
@@ -58,6 +69,7 @@ def gen_cmd(
             name=name,
             seed=seed,
             challenge_id=challenge_id,
+            arch=arch,
         )
     except FileNotFoundError as e:
         click.echo(f"error: {e}", err=True)

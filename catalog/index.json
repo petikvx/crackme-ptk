@@ -5,6 +5,7 @@
       "name": "xor-gate-easy",
       "type": "crackme",
       "language": "c",
+      "os": "linux",
       "arch": "linux-x86_64",
       "difficulty": 1,
       "summary": "crackme (c), difficulty 1",
@@ -21,6 +22,7 @@
       "name": "serial-mix-easy",
       "type": "keygenme",
       "language": "c",
+      "os": "linux",
       "arch": "linux-x86_64",
       "difficulty": 1,
       "summary": "keygenme (c), difficulty 1",
@@ -34,19 +36,22 @@
     },
     {
       "id": "cm-2026-003",
-      "name": "mon-crackme",
+      "name": "xor-bytes-easy",
       "type": "crackme",
       "language": "c",
+      "os": "linux",
       "arch": "linux-x86_64",
       "difficulty": 1,
-      "summary": "crackme (c), difficulty 1",
+      "summary": "crackme, c, diff 1, linux, xor_bytes",
       "tags": [
         "crackme",
         "c",
-        "diff-1"
+        "diff-1",
+        "linux",
+        "xor_bytes"
       ],
       "created": "2026-09-02",
-      "download": "mon-crackme-linux-x86_64.zip"
+      "download": "xor-bytes-easy-linux-x86_64.zip"
     }
   ]
 }

@@ -98,6 +98,8 @@ tr:hover td { background: rgba(61, 222, 156, 0.04); }
 
 .badge.type-crackme { color: #7dd3fc; border-color: #0369a1; }
 .badge.type-keygenme { color: #fcd34d; border-color: #a16207; }
+.badge.os-linux { color: #86efac; border-color: #15803d; }
+.badge.os-windows { color: #93c5fd; border-color: #1d4ed8; }
 
 a.btn {
   display: inline-block;
